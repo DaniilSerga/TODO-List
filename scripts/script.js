@@ -4,7 +4,7 @@ for (let i = 0; i < liElements.length; i++) {
     let deleteSpan = document.createElement('span');
     let deleteText = document.createTextNode('\u00D7');
     let editSpan = document.createElement('span');
-    let editText = document.createTextNode('\u270F');
+    let editText = document.createTextNode('\u270E');
 
     deleteSpan.className = 'close';
     deleteSpan.appendChild(deleteText);
@@ -23,6 +23,12 @@ for (let i = 0; i < deleteTaskElements.length; i++) {
     }
 }
 
+let editTaskElements = document.getElementsByClassName('edit');
+
+for (let i = 0; i < editTaskElements.length; i++) {
+    editTaskElements[i].onclick = () => editTask(editTaskElements[i]);
+}
+
 let ulElement = document.querySelector('ul');
 
 ulElement.addEventListener('click', function(event) {
@@ -39,20 +45,76 @@ function addTask() {
         return;
     }
     
-    let span = document.createElement('span');
-    let text = document.createTextNode('\u00D7');
-    let liElement = document.createElement('li');
-    let liText = document.createTextNode(inputBox.value);
-    
-    span.className = 'close';
-    span.appendChild(text);
-    span.onclick = function() {
+    const liElement = document.createElement('li');
+    const deleteSpan = document.createElement('span');
+    const deleteText = document.createTextNode('\u00D7');
+    const editSpan = document.createElement('span');
+    const editText = document.createTextNode('\u270E');
+    const taskNameSpan = document.createElement('span');
+    const taskName = document.createTextNode(inputBox.value);
+
+    deleteSpan.className = 'close';
+    deleteSpan.appendChild(deleteText);
+    deleteSpan.onclick = function() {
         this.parentElement.style.display = 'none';
     };
 
-    liElement.appendChild(liText);
-    liElement.appendChild(span);
+    editSpan.className = 'edit';
+    editSpan.appendChild(editText);
+    editSpan.onclick = () => editTask(editSpan);
+
+    taskNameSpan.className = 'task-name';
+    taskNameSpan.appendChild(taskName);
+
+    liElement.appendChild(deleteSpan);
+    liElement.appendChild(editSpan);
+    liElement.appendChild(taskNameSpan);
+
     ulElement.appendChild(liElement);
 
     inputBox.value = '';
+}
+
+function editTask(editSpan) {
+    const liElement = editSpan.closest('li');
+    const textSpan = liElement.querySelector('.task-name');
+    
+    const approveTaskName = document.createElement('span');
+    const approveTaskNameText = document.createTextNode('\u2713');
+    const inputBox = document.createElement('input');
+    
+    approveTaskName.className = 'approve-task-name';
+    approveTaskName.appendChild(approveTaskNameText);
+    approveTaskName.onclick = () => editTaskName(approveTaskName, inputBox);
+    
+    inputBox.className = 'rename-task-input'
+    inputBox.placeholder = 'Edit...';
+    inputBox.value = textSpan.textContent;
+
+    textSpan.replaceWith(inputBox);
+    editSpan.replaceWith(approveTaskName);
+}
+
+function editTaskName(approveTaskName, inputElement) {
+    let inputText = inputElement.value;
+
+    if (!inputText) {
+        alert('Введите новое название задачи!');
+        return;
+    }
+
+    const taskNameSpan = document.createElement('span');
+    const taskName = document.createTextNode(inputText);
+    const editSpan = document.createElement('span');
+    const editText = document.createTextNode('\u270E');
+
+    taskNameSpan.className = 'task-name'
+    taskNameSpan.appendChild(taskName);
+    
+    editSpan.className = 'edit';
+    editSpan.appendChild(editText);
+    editSpan.onclick = () => editTask(editSpan);
+
+    inputElement.replaceWith(taskNameSpan);
+    approveTaskName.replaceWith(editSpan);
 }
