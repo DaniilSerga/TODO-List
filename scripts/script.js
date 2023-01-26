@@ -1,13 +1,18 @@
 let liElements = document.getElementsByTagName('li');
 
 for (let i = 0; i < liElements.length; i++) {
-    let span = document.createElement('span');
-    let text = document.createTextNode('\u00D7');
-    
-    span.className = 'close';
-    span.appendChild(text);
+    let deleteSpan = document.createElement('span');
+    let deleteText = document.createTextNode('\u00D7');
+    let editSpan = document.createElement('span');
+    let editText = document.createTextNode('\u270F');
 
-    liElements[i].appendChild(span);
+    deleteSpan.className = 'close';
+    deleteSpan.appendChild(deleteText);
+    editSpan.className = 'edit';
+    editSpan.appendChild(editText);
+
+    liElements[i].appendChild(deleteSpan);
+    liElements[i].appendChild(editSpan);
 }
 
 let deleteTaskElements = document.getElementsByClassName('close');
