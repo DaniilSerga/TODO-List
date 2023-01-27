@@ -13,7 +13,6 @@ for (let i = 0; i < liElements.length; i++) {
 
     liElements[i].appendChild(deleteSpan);
     liElements[i].appendChild(editSpan);
-    enableChecking(liElements[i]);
 }
 
 let deleteTaskElements = document.getElementsByClassName('close');
@@ -31,18 +30,21 @@ for (let i = 0; i < editTaskElements.length; i++) {
 }
 
 
-function enableChecking(liElement) {
-    liElement.onclick = function() {
-        liElement.classList.toggle('checked');
-    }
-}
-// let ulElement = document.querySelector('ul');
-
-// ulElement.addEventListener('click', function(event) {
-//     if (event.target.tagName === 'LI') {
-//         event.target.classList.toggle('checked');
+// function enableChecking(liElement) {
+//     liElement.onclick = function() {
+//         liElement.classList.toggle('checked');
 //     }
-// });
+// }
+let ulElement = document.querySelector('ul');
+
+ulElement.addEventListener('click', function(event) {
+    if (event.target.tagName === 'SPAN') {
+        let liElement = event.target.closest('li');
+        liElement.classList.toggle('checked');
+    } else if (event.target.tagName === 'LI') {
+        event.target.classList.toggle('checked');
+    }
+});
 
 function addTask() {
     const ulElement = document.querySelector('ul');
@@ -77,7 +79,6 @@ function addTask() {
     liElement.appendChild(deleteSpan);
     liElement.appendChild(editSpan);
     liElement.appendChild(taskNameSpan);
-    enableChecking(liElement);
     
     ulElement.appendChild(liElement);
 
