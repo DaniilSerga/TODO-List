@@ -1,4 +1,5 @@
 let liElements = document.getElementsByTagName('li');
+let trueOrder = [...liElements];
 
 for (let i = 0; i < liElements.length; i++) {
     let deleteSpan = document.createElement('span');
@@ -16,7 +17,6 @@ for (let i = 0; i < liElements.length; i++) {
 }
 
 let deleteTaskElements = document.getElementsByClassName('close');
-
 for (let i = 0; i < deleteTaskElements.length; i++) {
     deleteTaskElements[i].onclick = function() {
         this.parentElement.style.display = 'none';
@@ -24,25 +24,73 @@ for (let i = 0; i < deleteTaskElements.length; i++) {
 }
 
 let editTaskElements = document.getElementsByClassName('edit');
-
 for (let i = 0; i < editTaskElements.length; i++) {
     editTaskElements[i].onclick = () => editTask(editTaskElements[i]);
 }
 
-
-// function enableChecking(liElement) {
-//     liElement.onclick = function() {
-//         liElement.classList.toggle('checked');
-//     }
-// }
 let ulElement = document.querySelector('ul');
-
 ulElement.addEventListener('click', function(event) {
-    if (event.target.tagName === 'SPAN') {
+    if (event.target.tagName === 'SPAN' && event.target.className == 'task-name') {
         let liElement = event.target.closest('li');
         liElement.classList.toggle('checked');
     } else if (event.target.tagName === 'LI') {
         event.target.classList.toggle('checked');
+    }
+});
+
+const applySearchButton = document.getElementById('apply-search');
+applySearchButton.onclick = function() {
+    const searchInput = document.getElementById('search').value;
+    
+    for (let i = 0; i < liElements.length; i++) {
+        let liText = liElements[i].querySelector('.task-name').textContent;
+
+        if (!liText.toLowerCase().includes(searchInput.toLowerCase())) {
+            liElements[i].style.display = 'none';
+        }
+    }   
+};
+
+const resetSearchButton = document.getElementById('reset-search');
+resetSearchButton.onclick = function() {
+    document.getElementById('search').value = '';
+
+    for (let li of liElements) {
+        li.style.display = 'block';
+    }
+};
+
+const sortingButton = document.getElementById('sorting-button');
+sortingButton.addEventListener('click', function(event) {
+    if (event.target.className == 'no-sort') {
+        event.target.className = 'descending';
+    } else if (event.target.className == 'descending') {
+        event.target.className = 'ascending';
+    } else {
+        event.target.className = 'no-sort';
+    }
+
+    let taskNames = document.getElementsByClassName('task-name');
+    let sortedArr = [...taskNames];
+
+    switch(event.target.className) {
+        case 'no-sort':
+            trueOrder.forEach(li => ulElement.appendChild(li));
+            break;
+        case 'ascending':
+            sortedArr.sort(function(a, b) {
+                return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
+            });
+
+            sortedArr.forEach(span => ulElement.appendChild(span.parentNode));
+            break;
+        case 'descending':
+            sortedArr.sort(function(a, b) {
+                return b.textContent.toLowerCase().localeCompare(a.textContent.toLowerCase());
+            });
+
+            sortedArr.forEach(span => ulElement.appendChild(span.parentNode));
+            break;
     }
 });
 
@@ -81,6 +129,7 @@ function addTask() {
     liElement.appendChild(taskNameSpan);
     
     ulElement.appendChild(liElement);
+    trueOrder.push(liElement);
 
     inputBox.value = '';
 }
