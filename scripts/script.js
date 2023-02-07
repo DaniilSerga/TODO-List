@@ -1,37 +1,43 @@
-let liElements = document.getElementsByTagName('li');
-let trueOrder = [...liElements];
+const liElements = document.getElementsByTagName('li');
+const initLiElements = [...liElements];
 
-for (let i = 0; i < liElements.length; i++) {
-    let deleteSpan = document.createElement('span');
-    let deleteText = document.createTextNode('\u00D7');
-    let editSpan = document.createElement('span');
-    let editText = document.createTextNode('\u270E');
+for (let liElement of liElements) {
+    const deleteSpan = document.createElement('span');
+    const deleteText = document.createTextNode('\u00D7');
+    const editSpan = document.createElement('span');
+    const editText = document.createTextNode('\u270E');
 
     deleteSpan.className = 'close';
     deleteSpan.appendChild(deleteText);
     editSpan.className = 'edit';
     editSpan.appendChild(editText);
 
-    liElements[i].appendChild(deleteSpan);
-    liElements[i].appendChild(editSpan);
+    liElement.appendChild(deleteSpan);
+    liElement.appendChild(editSpan);
 }
 
-let deleteTaskElements = document.getElementsByClassName('close');
-for (let i = 0; i < deleteTaskElements.length; i++) {
-    deleteTaskElements[i].onclick = function() {
-        this.parentElement.style.display = 'none';
-    }
+const deleteTaskElements = document.getElementsByClassName('close');
+for (let deleteTaskElement of deleteTaskElements) {
+    deleteTaskElement.addEventListener('click', function() {
+        this.parentElement.remove();
+
+        initLiElements.forEach((liElement, index) => {
+            if (liElement == this.parentElement) {
+                delete initLiElements[index];
+            }
+        });
+    });
 }
 
-let editTaskElements = document.getElementsByClassName('edit');
-for (let i = 0; i < editTaskElements.length; i++) {
-    editTaskElements[i].onclick = () => editTask(editTaskElements[i]);
+const editTaskElements = document.getElementsByClassName('edit');
+for (let editTaskElement of editTaskElements) {
+    editTaskElement.addEventListener('click', () => editTask(editTaskElement));
 }
 
-let ulElement = document.querySelector('ul');
-ulElement.addEventListener('click', function(event) {
+const ulElement = document.querySelector('ul');
+ulElement.addEventListener('click', event => {
     if (event.target.tagName === 'SPAN' && event.target.className == 'task-name') {
-        let liElement = event.target.closest('li');
+        const liElement = event.target.closest('li');
         liElement.classList.toggle('checked');
     } else if (event.target.tagName === 'LI') {
         event.target.classList.toggle('checked');
@@ -39,29 +45,29 @@ ulElement.addEventListener('click', function(event) {
 });
 
 const applySearchButton = document.getElementById('apply-search');
-applySearchButton.onclick = function() {
+applySearchButton.addEventListener('click', () => {
     const searchInput = document.getElementById('search').value;
     
-    for (let i = 0; i < liElements.length; i++) {
-        let liText = liElements[i].querySelector('.task-name').textContent;
+    for (let liElement of liElements) {
+        const liText = liElement.querySelector('.task-name').textContent;
 
         if (!liText.toLowerCase().includes(searchInput.toLowerCase())) {
-            liElements[i].style.display = 'none';
+            liElement.style.display = 'none';
         }
     }   
-};
+});
 
 const resetSearchButton = document.getElementById('reset-search');
-resetSearchButton.onclick = function() {
+resetSearchButton.addEventListener('click', () => {
     document.getElementById('search').value = '';
 
     for (let li of liElements) {
         li.style.display = 'block';
     }
-};
+});
 
 const sortingButton = document.getElementById('sorting-button');
-sortingButton.addEventListener('click', function(event) {
+sortingButton.addEventListener('click', event => {
     if (event.target.className == 'no-sort') {
         event.target.className = 'descending';
     } else if (event.target.className == 'descending') {
@@ -71,32 +77,32 @@ sortingButton.addEventListener('click', function(event) {
     }
 
     let taskNames = document.getElementsByClassName('task-name');
-    let sortedArr = [...taskNames];
+    let sortedTasksNames = [...taskNames];
 
     switch(event.target.className) {
         case 'no-sort':
-            trueOrder.forEach(li => ulElement.appendChild(li));
+            initLiElements.forEach(li => ulElement.appendChild(li));
             break;
         case 'ascending':
-            sortedArr.sort(function(a, b) {
+            sortedTasksNames.sort(function(a, b) {
                 return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
             });
 
-            sortedArr.forEach(span => ulElement.appendChild(span.parentNode));
+            sortedTasksNames.forEach(span => ulElement.appendChild(span.parentNode));
             break;
         case 'descending':
-            sortedArr.sort(function(a, b) {
+            sortedTasksNames.sort(function(a, b) {
                 return b.textContent.toLowerCase().localeCompare(a.textContent.toLowerCase());
             });
 
-            sortedArr.forEach(span => ulElement.appendChild(span.parentNode));
+            sortedTasksNames.forEach(span => ulElement.appendChild(span.parentNode));
             break;
     }
 });
 
 function addTask() {
     const ulElement = document.querySelector('ul');
-    let inputBox = document.getElementById('task-input');
+    const inputBox = document.getElementById('task-input');
     
     if (!inputBox.value) {
         alert('Вы не указали задачу!');
@@ -113,13 +119,19 @@ function addTask() {
 
     deleteSpan.className = 'close';
     deleteSpan.appendChild(deleteText);
-    deleteSpan.onclick = function() {
-        this.parentElement.style.display = 'none';
-    };
+    deleteSpan.addEventListener('click', function() {
+        this.parentElement.remove();
+
+        initLiElements.forEach((liElement, index) => {
+            if (liElement == this.parentElement) {
+                delete initLiElements[index];
+            }
+        });
+    });
 
     editSpan.className = 'edit';
     editSpan.appendChild(editText);
-    editSpan.onclick = () => editTask(editSpan);
+    editSpan.addEventListener('click', () => editTask(editSpan));
 
     taskNameSpan.className = 'task-name';
     taskNameSpan.appendChild(taskName);
@@ -129,7 +141,7 @@ function addTask() {
     liElement.appendChild(taskNameSpan);
     
     ulElement.appendChild(liElement);
-    trueOrder.push(liElement);
+    initLiElements.push(liElement);
 
     inputBox.value = '';
 }
@@ -137,14 +149,13 @@ function addTask() {
 function editTask(editSpan) {
     const liElement = editSpan.closest('li');
     const textSpan = liElement.querySelector('.task-name');
-    
     const approveTaskName = document.createElement('span');
     const approveTaskNameText = document.createTextNode('\u2713');
     const inputBox = document.createElement('input');
     
     approveTaskName.className = 'approve-task-name';
     approveTaskName.appendChild(approveTaskNameText);
-    approveTaskName.onclick = () => editTaskName(approveTaskName, inputBox);
+    approveTaskName.addEventListener('click', () => editTaskName(approveTaskName, inputBox));
     
     inputBox.className = 'rename-task-input'
     inputBox.placeholder = 'Edit...';
@@ -172,7 +183,7 @@ function editTaskName(approveTaskName, inputElement) {
     
     editSpan.className = 'edit';
     editSpan.appendChild(editText);
-    editSpan.onclick = () => editTask(editSpan);
+    editSpan.addEventListener('click', () => editTask(editSpan));
 
     inputElement.replaceWith(taskNameSpan);
     approveTaskName.replaceWith(editSpan);
